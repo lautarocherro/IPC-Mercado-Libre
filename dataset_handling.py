@@ -10,7 +10,7 @@ def make_csv() -> None:
     :return: None
     """
     # Get the data needed
-    prices = get_item_prices(get_items(get_categories()))
+    prices = get_items_prices(get_items_ids(get_categories()))
 
     # Get the current date
     today = datetime.now().strftime("%Y-%m-%d")
@@ -49,23 +49,23 @@ def get_categories() -> List[str]:
     return children_categories
 
 
-def get_items(categories: List[str]) -> List[str]:
+def get_items_ids(categories: List[str]) -> List[str]:
     """
     Get all the approved items from the categories passed as a parameter
     :param categories: a list containing the id's of the categories
-    :return: a dictionary containing the id's of the items as keys and their prices as values
+    :return: a list containing the id's of all the approved items
     """
-    items = []
+    ids = []
     for category in categories:
         json = requests.get(f'https://api.mercadolibre.com/sites/MLA/search?category={category}').json()
         for item in json['results']:
             if item["shipping"]["logistic_type"] == "fulfillment" and item["condition"] == "new":
-                items.append(item["id"])
+                ids.append(item["id"])
 
-    return items
+    return ids
 
 
-def get_item_prices(items: List[str]) -> Dict[str, float]:
+def get_items_prices(items: List[str]) -> Dict[str, float]:
     """
     Get the prices of all the items passed as a parameter
     :param items: a list containing the id's of the items
@@ -103,7 +103,7 @@ def update_csv() -> None:
     ids = month_df['id'].tolist()
 
     # Get today's prices
-    prices = get_item_prices(ids)
+    prices = get_items_prices(ids)
 
     # Get the current date
     today = datetime.now().strftime("%Y-%m-%d")
