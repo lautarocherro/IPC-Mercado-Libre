@@ -92,7 +92,7 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
     return prices
 
 
-def update_csv() -> None:
+def get_updated_month_df() -> pd.DataFrame:
     # Get the csv name
     csv_name = datetime.now().strftime("%Y-%m")
 
@@ -122,8 +122,11 @@ def update_csv() -> None:
     # Save the dataframe to the csv file
     month_df.to_csv(f'datasets/{csv_name}.csv', index=False)
 
+    return month_df
 
-print('Starting')
-make_csv()
-print('Finishing')
-update_csv()
+
+if __name__ == "__main__":
+    print('Starting')
+    make_csv()
+    print('Finishing')
+    get_updated_month_df()
