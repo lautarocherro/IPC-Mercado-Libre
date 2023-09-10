@@ -12,6 +12,7 @@ from requests_oauthlib import OAuth1Session
 
 class IPCMeli:
     def __init__(self):
+        self.today_str = None
         self.today_inflation = None
         self.month_inflation = None
         self.tweet_content = None
@@ -84,25 +85,26 @@ class IPCMeli:
             make_csv()
         else:
             # Get tweet content
-            self.tweet_content += f'{emoji} La inflación de hoy según Mercado Libre fue un {self.today_inflation}%\n'
-            self.tweet_content += f'🗓️ La inflación mensual {month_message} {self.month_inflation}%'
+            self.tweet_content += f'La inflación según Mercado Libre del {self.today_str} {emoji}\n\n'
+            self.tweet_content += f'La inflación de diaria fue {self.today_inflation}%\n'
+            self.tweet_content += f'🗓️ La inflación mensual {month_message} {self.month_inflation}%\n'
 
     def calculate_inflation(self):
         # Get updated month df
         month_df = get_updated_month_df()
 
         # Get current date
-        today = datetime.now().strftime("%Y-%m-%d")
+        self.today_str = datetime.now().strftime("%Y-%m-%d")
 
         # Get yesterday to compare with current date
-        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        yesterday_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Get comparable df (remove deleted posts)
-        month_df = month_df[month_df[today] > 0]
+        month_df = month_df[month_df[self.today_str] > 0]
 
         # Compare prices
-        yesterday_price = month_df[yesterday].sum()
-        today_price = month_df[today].sum()
+        yesterday_price = month_df[yesterday_str].sum()
+        today_price = month_df[self.today_str].sum()
 
         # Get today's percentage change
         self.today_inflation = round((today_price - yesterday_price) / yesterday_price * 100, 2)
