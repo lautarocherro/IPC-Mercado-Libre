@@ -85,8 +85,8 @@ class IPCMeli:
             make_csv()
         else:
             # Get tweet content
-            self.tweet_content += f'La inflación según Mercado Libre del {self.today_str} {emoji}\n\n'
-            self.tweet_content += f'La inflación de diaria fue {self.today_inflation}%\n'
+            self.tweet_content += f'🇦🇷 La inflación según Mercado Libre del {self.today_str} {emoji}\n\n'
+            self.tweet_content += f'⁉️ La inflación de diaria fue {self.today_inflation}%\n'
             self.tweet_content += f'🗓️ La inflación mensual {month_message} {self.month_inflation}%\n'
 
     def calculate_inflation(self):
