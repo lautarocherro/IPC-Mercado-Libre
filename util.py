@@ -27,3 +27,37 @@ def load_env_variables():
             if line.strip() and not line.startswith('#'):
                 key, value = line.strip().split('=', 1)
                 environ[key] = value
+
+
+weekday_mapping = {
+    "Sunday": f"Domingo",
+    "Monday": "Lunes",
+    "Tuesday": "Martes",
+    "Wednesday": "Miércoles",
+    "Thursday": "Jueves",
+    "Friday": "Viernes",
+    "Saturday": f"Sábado"
+}
+
+month_mapping = {
+    1: "Enero",
+    2: "Febrero",
+    3: "Marzo",
+    4: "Abril",
+    5: "Mayo",
+    6: "Junio",
+    7: "Julio",
+    8: "Agosto",
+    9: "Septiembre",
+    10: "Octubre",
+    11: "Noviembre",
+    12: "Diciembre"
+}
+
+
+def get_today_str() -> str:
+    weekday = datetime.now().strftime("%A")
+    day = datetime.now().day
+    month = datetime.now().month
+    year = datetime.now().year
+    return f"{weekday_mapping.get(weekday, '')} {day} de {month_mapping.get(month, '')} de {year}"

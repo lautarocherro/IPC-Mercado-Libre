@@ -1,12 +1,13 @@
 from calendar import monthrange
 from datetime import datetime, timedelta
 from json import dumps
+from os import getenv
+
 from dataset_handling import make_csv, get_updated_month_df
 
 import requests
 
-from util import sleep_until_next_tweet, load_env_variables
-from os import getenv
+from util import sleep_until_next_tweet, load_env_variables, get_today_str
 from requests_oauthlib import OAuth1Session
 
 
@@ -78,8 +79,7 @@ class IPCMeli:
             month_message = "se mantiene en"
 
         # Get tweet content
-        today_str = datetime.now().strftime("%d-%m-%Y")
-        self.tweet_content += f'🇦🇷 La inflación según Mercado Libre del día {today_str} {emoji}\n\n'
+        self.tweet_content += f'🇦🇷 La inflación según Mercado Libre del día {get_today_str()} {emoji}\n\n'
         self.tweet_content += f'⁉️ Se registró una inflación del {self.today_inflation}%\n'
             
         # Check wheter it's the last day of month
