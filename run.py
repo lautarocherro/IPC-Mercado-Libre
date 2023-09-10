@@ -12,7 +12,6 @@ from requests_oauthlib import OAuth1Session
 
 class IPCMeli:
     def __init__(self):
-        self.today_str = None
         self.today_inflation = None
         self.month_inflation = None
         self.tweet_content = None
@@ -77,34 +76,37 @@ class IPCMeli:
         else:
             emoji = "👌"
             month_message = "se mantiene en"
+
+        # Get tweet content
+        today_str = datetime.now().strftime("%d-%m-%Y")
+        self.tweet_content += f'🇦🇷 La inflación según Mercado Libre del día {today_str} {emoji}\n\n'
+        self.tweet_content += f'⁉️ Se registró una inflación del {self.today_inflation}%\n'
             
         # Check wheter it's the last day of month
         last_day_of_month = datetime.now().day == monthrange(datetime.now().year, datetime.now().month)[1]
-
         if last_day_of_month:
+            # Make csv for next month
             make_csv()
+            self.tweet_content += f'🗓️ El mes cerró con una tasa de inflación del {self.month_inflation}%\n'
         else:
-            # Get tweet content
-            self.tweet_content += f'🇦🇷 La inflación según Mercado Libre del {self.today_str} {emoji}\n\n'
-            self.tweet_content += f'⁉️ La inflación de diaria fue {self.today_inflation}%\n'
-            self.tweet_content += f'🗓️ La inflación mensual {month_message} {self.month_inflation}%\n'
+            self.tweet_content += f'🗓️ La tasa mensual {month_message} {self.month_inflation}%\n'
 
     def calculate_inflation(self):
         # Get updated month df
         month_df = get_updated_month_df()
 
         # Get current date
-        self.today_str = datetime.now().strftime("%Y-%m-%d")
+        today_str = datetime.now().strftime("%Y-%m-%d")
 
         # Get yesterday to compare with current date
         yesterday_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Get comparable df (remove deleted posts)
-        month_df = month_df[month_df[self.today_str] > 0]
+        month_df = month_df[month_df[today_str] > 0]
 
         # Compare prices
         yesterday_price = month_df[yesterday_str].sum()
-        today_price = month_df[self.today_str].sum()
+        today_price = month_df[today_str].sum()
 
         # Get today's percentage change
         self.today_inflation = round((today_price - yesterday_price) / yesterday_price * 100, 2)
