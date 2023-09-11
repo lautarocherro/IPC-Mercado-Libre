@@ -13,6 +13,7 @@ from requests_oauthlib import OAuth1Session
 
 class IPCMeli:
     def __init__(self):
+        self.last_day_of_month = None
         self.today_inflation = None
         self.month_inflation = None
         self.tweet_content = None
@@ -27,8 +28,16 @@ class IPCMeli:
         print("Running...")
         while True:
             try:
+                # Sleep until the next tweet time
                 sleep_until_next_tweet()
+
+                # Check if it's the last day of month and make tweet
+                self.last_day_of_month = datetime.now().day == monthrange(datetime.now().year, datetime.now().month)[1]
                 self.make_tweet()
+
+                # Make csv for next month
+                if self.last_day_of_month:
+                    make_csv()
             except Exception as e:
                 print(e)
                 self.send_discord_message()
@@ -83,10 +92,8 @@ class IPCMeli:
         self.tweet_content += f'{emoji} Se registró una inflación del {self.today_inflation}%\n'
             
         # Check wheter it's the last day of month
-        last_day_of_month = datetime.now().day == monthrange(datetime.now().year, datetime.now().month)[1]
-        if last_day_of_month:
-            # Make csv for next month
-            make_csv()
+
+        if self.last_day_of_month:
             self.tweet_content += f'🗓️ El mes cerró con una tasa de inflación del {self.month_inflation}%\n'
         else:
             self.tweet_content += f'🗓️ La tasa mensual {month_message} {self.month_inflation}%\n'
