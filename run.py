@@ -70,10 +70,10 @@ class IPCMeli:
 
         if self.today_inflation > 0:
             emoji = "📈"
-            month_message = "asciende a"
+            month_message = "asciende al"
         elif self.today_inflation < 0:
             emoji = "📉"
-            month_message = "desciende a"
+            month_message = "desciende al"
         else:
             emoji = "👌"
             month_message = "se mantiene en"
