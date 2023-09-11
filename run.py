@@ -79,7 +79,7 @@ class IPCMeli:
             month_message = "se mantiene en"
 
         # Get tweet content
-        self.tweet_content += f'🇦🇷 La inflación según Mercado Libre del {get_today_str()}\n\n'
+        self.tweet_content += f'🇦🇷 Inflación según Mercado Libre del {get_today_str()}\n\n'
         self.tweet_content += f'{emoji} Se registró una inflación del {self.today_inflation}%\n'
             
         # Check wheter it's the last day of month
