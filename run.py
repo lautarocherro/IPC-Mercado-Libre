@@ -1,6 +1,5 @@
 from calendar import monthrange
 from datetime import datetime, timedelta
-from json import dumps
 from os import getenv
 
 from dataset_handling import make_csv, get_updated_month_df
@@ -62,16 +61,12 @@ class IPCMeli:
             json=payload,
         )
 
-        if response.status_code != 201:
+        if response.status_code == 201:
+            print("Tweet generated successfully")
+        else:
             raise Exception(
                 "Request returned an error: {} {}".format(response.status_code, response.text)
             )
-
-        print("Response code: {}".format(response.status_code))
-
-        # Saving the response as JSON
-        json_response = response.json()
-        print(dumps(json_response, indent=4, sort_keys=True))
 
     def set_tweet_content(self):
         self.tweet_content = ""
