@@ -33,20 +33,10 @@ def get_categories() -> List[str]:
     Get all the 2nd level categories from the MercadoLibre API
     :return: a list containing the id's of all the 2nd level categories
     """
-    json = requests.get('https://api.mercadolibre.com/sites/MLA/categories').json()
+    with open("datasets/categories.txt", "r") as file:
+        categories = file.read().splitlines()
 
-    major_categories = []
-    for category_dict in json:
-        major_categories.append(category_dict['id'])
-
-    children_categories = []
-    for category in major_categories:
-        request = requests.get(f'https://api.mercadolibre.com/categories/{category}')
-        json = request.json()
-        for subcategory in json['children_categories']:
-            children_categories.append(subcategory['id'])
-
-    return children_categories
+    return categories
 
 
 def get_items_ids(categories: List[str]) -> List[str]:
