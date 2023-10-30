@@ -53,8 +53,6 @@ def get_items_ids(categories: List[str]) -> List[str]:
             if item["shipping"]["logistic_type"] == "fulfillment" and item["condition"] == "new":
                 ids.append(item["id"])
 
-    # Randomly select 5000 ids
-    ids = sample(ids, 5000)
     return ids
 
 
