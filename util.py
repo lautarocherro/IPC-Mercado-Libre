@@ -13,6 +13,7 @@ def sleep_until_next_tweet():
     # Set the target datetime for the next day at 8 PM
     target_datetime = current_datetime.replace(hour=20, minute=0, second=0, microsecond=0)
 
+    # if 20hs have past, make tweet tomorrow
     if current_datetime.hour >= 20:
         target_datetime += timedelta(days=1)
 
