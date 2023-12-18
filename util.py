@@ -1,6 +1,9 @@
+import json
 from datetime import datetime, timezone, timedelta
 from time import sleep
 from os import environ
+
+import pandas as pd
 
 
 def sleep_until_next_tweet():
@@ -56,8 +59,34 @@ month_mapping = {
 
 
 def get_today_str() -> str:
-    weekday = datetime.now().strftime("%A")
-    day = datetime.now().day
-    month = datetime.now().month
-    year = datetime.now().year
+    current_date = datetime.now()
+    weekday = current_date.strftime("%A")
+    day = current_date.day
+    month = current_date.month
+    year = current_date.year
     return f"{weekday_mapping.get(weekday, '')} {day} de {month_mapping.get(month, '')} de {year}"
+
+
+def get_ytd_inflation(month_inflation: float) -> float:
+    current_date = datetime.now()
+    current_month = current_date.month
+
+    # Read ytd inflation file
+    with open("datasets/ytd-inflation.json") as file:
+        ytd_inflation_json = json.load(file)
+
+    # Modify file with new monthly inflation and save
+    ytd_inflation_json[current_date.strftime("%Y-%m")] = month_inflation
+    with open("datasets/ytd-inflation.json", "w") as file:
+        json.dump(ytd_inflation_json, file)
+
+    year_months_list = [(current_date - timedelta(days=30 * i)).strftime("%Y-%m") for i in range(current_month)][::-1]
+
+    ytd_inflation = 1
+    for year_month in year_months_list:
+        month_inflation = 1 + ytd_inflation_json[year_month] / 100
+        ytd_inflation *= month_inflation
+
+    ytd_inflation -= 1
+
+    return round(ytd_inflation, 2)

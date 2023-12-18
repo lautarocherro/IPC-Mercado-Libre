@@ -34,7 +34,7 @@ def get_categories() -> List[str]:
     Get all the 2nd level categories from the MercadoLibre API
     :return: a list containing the id's of all the 2nd level categories
     """
-    with open("datasets/categories.txt", "r") as file:
+    with open("datasets/categories.txt") as file:
         categories = file.read().splitlines()
 
     return categories

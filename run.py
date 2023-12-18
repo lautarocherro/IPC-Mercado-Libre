@@ -2,6 +2,7 @@ from calendar import monthrange
 from datetime import datetime, timedelta
 from os import getenv
 
+import util
 from dataset_handling import make_csv, get_updated_month_df
 
 import requests
@@ -12,6 +13,7 @@ from requests_oauthlib import OAuth1Session
 
 class IPCMeli:
     def __init__(self):
+        self.ytd_inflation = None
         self.last_day_of_month = None
         self.today_inflation = None
         self.month_inflation = None
@@ -87,11 +89,14 @@ class IPCMeli:
         self.tweet_content += f'{emoji} Se registró una inflación del {self.today_inflation}%\n'
             
         # Check wheter it's the last day of month
-
         if self.last_day_of_month:
             self.tweet_content += f'🗓️ El mes cerró con una tasa de inflación del {self.month_inflation}%\n'
         else:
             self.tweet_content += f'🗓️ La tasa mensual {month_message} {self.month_inflation}%\n'
+
+        # Add yearly inflation
+        if datetime.now().year >= 2024:
+            self.tweet_content += f'\nLa tasa anual es del {self.ytd_inflation}%\n'
 
     def calculate_inflation(self):
         # Get updated month df
@@ -117,6 +122,9 @@ class IPCMeli:
         first_month_day_price = month_df.iloc[:, 1:2].sum().iloc[0]
 
         self.month_inflation = round((today_price - first_month_day_price) / first_month_day_price * 100, 2)
+
+        if datetime.now().year >= 2024:
+            self.ytd_inflation = util.get_ytd_inflation(self.month_inflation)
 
     def send_discord_message(self):
         try:
