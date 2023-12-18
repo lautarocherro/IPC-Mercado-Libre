@@ -11,7 +11,10 @@ def sleep_until_next_tweet():
     current_datetime = datetime.now(timezone(timedelta(hours=-3)))
 
     # Set the target datetime for the next day at 8 PM
-    target_datetime = current_datetime.replace(hour=20, minute=0, second=0, microsecond=0) + timedelta(days=1)
+    target_datetime = current_datetime.replace(hour=20, minute=0, second=0, microsecond=0)
+
+    if current_datetime.hour >= 20:
+        target_datetime += timedelta(days=1)
 
     # Calculate the time difference between the current and target datetime
     time_difference = target_datetime - current_datetime
