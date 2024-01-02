@@ -96,7 +96,7 @@ class IPCMeli:
 
         # Add yearly inflation
         if datetime.now().year >= 2024:
-            self.tweet_content += f'\nLa tasa anual es del {self.ytd_inflation}%\n'
+            self.tweet_content += f'\n🔺 La tasa anual es del {self.ytd_inflation}%\n'
 
     def calculate_inflation(self):
         # Get updated month df
