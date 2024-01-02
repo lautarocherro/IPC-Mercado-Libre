@@ -92,5 +92,6 @@ def get_ytd_inflation(month_inflation: float) -> float:
         ytd_inflation *= month_inflation
 
     ytd_inflation -= 1
+    ytd_inflation *= 100
 
     return round(ytd_inflation, 2)
