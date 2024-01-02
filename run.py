@@ -90,13 +90,13 @@ class IPCMeli:
             
         # Check wheter it's the last day of month
         if self.last_day_of_month:
-            self.tweet_content += f'🗓️ El mes cerró con una tasa de inflación del {self.month_inflation}%\n'
+            self.tweet_content += f'🗓️ El mes cerró con una tasa de inflación del {self.month_inflation}%\n\n'
         else:
-            self.tweet_content += f'🗓️ La tasa mensual {month_message} {self.month_inflation}%\n'
+            self.tweet_content += f'🗓️ La tasa mensual {month_message} {self.month_inflation}%\n\n'
 
         # Add yearly inflation
         if datetime.now().year >= 2024:
-            self.tweet_content += f'\n🔺 La tasa anual es del {self.ytd_inflation}%\n'
+            self.tweet_content += f'🔺 La tasa anual acumulada es del {self.ytd_inflation}%\n'
 
     def calculate_inflation(self):
         # Get updated month df
