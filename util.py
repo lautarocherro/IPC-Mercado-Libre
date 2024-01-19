@@ -1,39 +1,6 @@
 import json
 from datetime import datetime, timezone, timedelta
 from time import sleep
-from os import environ
-
-import pandas as pd
-
-
-def sleep_until_next_tweet():
-    # Get the current datetime in UTC-3
-    current_datetime = datetime.now(timezone(timedelta(hours=-3)))
-
-    # Set the target datetime for the next day at 8 PM
-    target_datetime = current_datetime.replace(hour=20, minute=0, second=0, microsecond=0)
-
-    # if 20hs have past, make tweet tomorrow
-    if current_datetime.hour >= 20:
-        target_datetime += timedelta(days=1)
-
-    # Calculate the time difference between the current and target datetime
-    time_difference = target_datetime - current_datetime
-
-    # Convert the time difference to seconds
-    sleep_duration = time_difference.total_seconds()
-
-    print(f"Sleeping for {sleep_duration} seconds. Next tweet will be at {target_datetime}")
-    # Sleep until the target datetime
-    sleep(sleep_duration)
-
-
-def load_env_variables():
-    with open(".env", 'r') as f:
-        for line in f:
-            if line.strip() and not line.startswith('#'):
-                key, value = line.strip().split('=', 1)
-                environ[key] = value
 
 
 weekday_mapping = {

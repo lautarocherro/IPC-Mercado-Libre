@@ -1,13 +1,12 @@
 from calendar import monthrange
 from datetime import datetime, timedelta
-from os import getenv
-
+import os
 import util
 from dataset_handling import make_csv, get_updated_month_df
 
 import requests
 
-from util import sleep_until_next_tweet, load_env_variables, get_today_str
+from util import get_today_str
 from requests_oauthlib import OAuth1Session
 
 
@@ -18,30 +17,25 @@ class IPCMeli:
         self.today_inflation = None
         self.month_inflation = None
         self.tweet_content = None
-        load_env_variables()
-        self.consumer_key = getenv("TW_CONSUMER_KEY")
-        self.consumer_secret = getenv("TW_CONSUMER_SECRET")
-        self.oauth_token = getenv("TW_OAUTH_TOKEN")
-        self.oauth_token_secret = getenv("TW_OAUTH_TOKEN_SECRET")
-        self.webhook_url = getenv("DISCORD_WEBHOOK")
+        self.consumer_key = os.environ.get("TW_CONSUMER_KEY")
+        self.consumer_secret = os.environ.get("TW_CONSUMER_SECRET")
+        self.oauth_token = os.environ.get("TW_OAUTH_TOKEN")
+        self.oauth_token_secret = os.environ.get("TW_OAUTH_TOKEN_SECRET")
+        self.webhook_url = os.environ.get("DISCORD_WEBHOOK")
 
     def run(self):
         print("Running...")
-        while True:
-            try:
-                # Sleep until the next tweet time
-                sleep_until_next_tweet()
+        try:
+            # Check if it's the last day of month and make tweet
+            self.last_day_of_month = datetime.now().day == monthrange(datetime.now().year, datetime.now().month)[1]
+            self.make_tweet()
 
-                # Check if it's the last day of month and make tweet
-                self.last_day_of_month = datetime.now().day == monthrange(datetime.now().year, datetime.now().month)[1]
-                self.make_tweet()
-
-                # Make csv for next month
-                if self.last_day_of_month:
-                    make_csv()
-            except Exception as e:
-                print(e)
-                self.send_discord_message()
+            # Make csv for next month
+            if self.last_day_of_month:
+                make_csv()
+        except Exception as e:
+            print(e)
+            self.send_discord_message()
 
     def make_tweet(self):
         # Set Tweet's content
@@ -87,7 +81,7 @@ class IPCMeli:
         # Get tweet content
         self.tweet_content += f'🇦🇷 Inflación según Mercado Libre del {get_today_str()}\n\n'
         self.tweet_content += f'{emoji} Se registró una inflación del {self.today_inflation}%\n'
-            
+
         # Check wheter it's the last day of month
         if self.last_day_of_month:
             self.tweet_content += f'🗓️ El mes cerró con una tasa de inflación del {self.month_inflation}%\n\n'
