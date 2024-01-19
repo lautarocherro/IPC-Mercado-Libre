@@ -2,7 +2,7 @@ name: Daily Run
 
 on:
   schedule:
-    - cron: '50 19 * * *'
+    - cron: '0 0 * * *'
 
 jobs:
   run-script:
