@@ -2,7 +2,7 @@ name: Daily Run
 
 on:
   schedule:
-    - cron: '40 19 * * *'
+    - cron: '50 19 * * *'
 
 jobs:
   run-script:
@@ -38,4 +38,4 @@ jobs:
         git commit -m "Datasets update"
         git push --set-upstream origin $GITHUB_REF
       env:
-        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
