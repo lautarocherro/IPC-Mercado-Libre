@@ -1,0 +1,41 @@
+name: Daily Run
+
+on:
+  schedule:
+    - cron: '15 19 * * *'
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run Python script
+      run: python run.py
+      env:
+        TW_CONSUMER_KEY: ${{ secrets.TW_CONSUMER_KEY }}
+        TW_CONSUMER_SECRET: ${{ secrets.TW_CONSUMER_SECRET }}
+        TW_OAUTH_TOKEN: ${{ secrets.TW_OAUTH_TOKEN }}
+        TW_OAUTH_TOKEN_SECRET: ${{ secrets.TW_OAUTH_TOKEN_SECRET }}
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "cherrolautaro@gmail.com"
+        git config --local user.name "lautarocherro"
+        git add .
+        git commit -m "Datasets update"
+        git push --set-upstream origin $GITHUB_REF
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
