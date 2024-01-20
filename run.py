@@ -24,7 +24,7 @@ class IPCMeli:
         self.webhook_url = os.environ.get("DISCORD_WEBHOOK")
 
     def run(self):
-        print("Running...")
+        print(f'Running at {get_now_arg().strftime("%Y-%m-%d %H:%M:%S")}')
         try:
             # Check if it's the last day of month and make tweet
             self.last_day_of_month = get_now_arg().day == monthrange(get_now_arg().year, get_now_arg().month)[1]
