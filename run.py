@@ -1,12 +1,12 @@
 from calendar import monthrange
-from datetime import datetime, timedelta
+from datetime import timedelta
 import os
 import util
 from dataset_handling import make_csv, get_updated_month_df
 
 import requests
 
-from util import get_today_str
+from util import get_today_str, get_now_arg
 from requests_oauthlib import OAuth1Session
 
 
@@ -27,7 +27,7 @@ class IPCMeli:
         print("Running...")
         try:
             # Check if it's the last day of month and make tweet
-            self.last_day_of_month = datetime.now().day == monthrange(datetime.now().year, datetime.now().month)[1]
+            self.last_day_of_month = get_now_arg().day == monthrange(get_now_arg().year, get_now_arg().month)[1]
             self.make_tweet()
 
             # Make csv for next month
@@ -89,7 +89,7 @@ class IPCMeli:
             self.tweet_content += f'🗓️ La tasa mensual {month_message} {self.month_inflation}%\n\n'
 
         # Add yearly inflation
-        if datetime.now().year >= 2024:
+        if get_now_arg().year >= 2024:
             self.tweet_content += f'🔺 La tasa anual acumulada es del {self.ytd_inflation}%\n'
 
     def calculate_inflation(self):
@@ -97,10 +97,10 @@ class IPCMeli:
         month_df = get_updated_month_df()
 
         # Get current date
-        today_str = datetime.now().strftime("%Y-%m-%d")
+        today_str = get_now_arg().strftime("%Y-%m-%d")
 
         # Get yesterday to compare with current date
-        yesterday_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        yesterday_str = (get_now_arg() - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Get comparable df (remove deleted posts)
         month_df = month_df[month_df[today_str] > 0]
@@ -117,7 +117,7 @@ class IPCMeli:
 
         self.month_inflation = round((today_price - first_month_day_price) / first_month_day_price * 100, 2)
 
-        if datetime.now().year >= 2024:
+        if util.get_now_arg().year >= 2024:
             self.ytd_inflation = util.get_ytd_inflation(self.month_inflation)
 
     def send_discord_message(self):

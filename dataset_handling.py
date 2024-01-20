@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta
-from random import sample
+from datetime import timedelta
 from typing import List, Dict
 import pandas as pd
 import requests
+
+from util import get_now_arg
 
 
 def make_csv() -> None:
@@ -14,7 +15,7 @@ def make_csv() -> None:
     prices = get_items_prices(get_items_ids(get_categories()))
 
     # Get the current date
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = get_now_arg().strftime("%Y-%m-%d")
 
     # Create a Dataframe from the data
     month_df = pd.DataFrame(
@@ -25,7 +26,7 @@ def make_csv() -> None:
     )
 
     # Create the csv file
-    csv_name = (datetime.now() + timedelta(days=1)).strftime("%Y-%m")
+    csv_name = (get_now_arg() + timedelta(days=1)).strftime("%Y-%m")
     month_df.to_csv(f'datasets/{csv_name}.csv', index=False)
 
 
@@ -85,7 +86,7 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
 
 def get_updated_month_df() -> pd.DataFrame:
     # Get the csv name
-    csv_name = datetime.now().strftime("%Y-%m")
+    csv_name = get_now_arg().strftime("%Y-%m")
 
     # Load csv to a dataframe
     month_df = pd.read_csv(f'datasets/{csv_name}.csv')
@@ -97,7 +98,7 @@ def get_updated_month_df() -> pd.DataFrame:
     prices = get_items_prices(ids)
 
     # Get the current date
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = get_now_arg().strftime("%Y-%m-%d")
 
     # Make new df out of the prices
     new_prices_df = pd.DataFrame(

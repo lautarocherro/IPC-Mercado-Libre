@@ -1,6 +1,5 @@
 import json
-from datetime import datetime, timezone, timedelta
-from time import sleep
+from datetime import datetime, timedelta
 
 
 weekday_mapping = {
@@ -30,7 +29,7 @@ month_mapping = {
 
 
 def get_today_str() -> str:
-    current_date = datetime.now()
+    current_date = get_now_arg()
     weekday = current_date.strftime("%A")
     day = current_date.day
     month = current_date.month
@@ -39,7 +38,7 @@ def get_today_str() -> str:
 
 
 def get_ytd_inflation(month_inflation: float) -> float:
-    current_date = datetime.now()
+    current_date = get_now_arg()
     current_month = current_date.month
 
     # Read ytd inflation file
@@ -62,3 +61,16 @@ def get_ytd_inflation(month_inflation: float) -> float:
     ytd_inflation *= 100
 
     return round(ytd_inflation, 2)
+
+
+def get_now_arg():
+    # Get the current UTC time
+    utc_now = datetime.utcnow()
+
+    # Define a timedelta for UTC - 3 hours
+    utc_minus_3_delta = timedelta(hours=-3)
+
+    # Calculate the UTC - 3 time by subtracting the timedelta
+    utc_minus_3_time = utc_now + utc_minus_3_delta
+
+    return utc_minus_3_time
