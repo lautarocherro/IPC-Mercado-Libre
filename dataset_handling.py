@@ -73,7 +73,7 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
         json = requests.get(f'https://api.mercadolibre.com/items?ids={items_str}'
                             f'&attributes=id,price,shipping.logistic_type').json()
         for item in json:
-            if item["code"] == 200 and "price" in item["body"]:
+            if str(item["code"]) == "200" and "price" in item["body"]:
                 item_id = item["body"]["id"]
                 price = item["body"]["price"]
                 prices[item_id] = price

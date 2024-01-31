@@ -25,17 +25,14 @@ class IPCMeli:
 
     def run(self):
         print(f'Running at {get_now_arg().strftime("%Y-%m-%d %H:%M:%S")}')
-        try:
-            # Check if it's the last day of month and make tweet
-            self.last_day_of_month = get_now_arg().day == monthrange(get_now_arg().year, get_now_arg().month)[1]
-            self.make_tweet()
 
-            # Make csv for next month
-            if self.last_day_of_month:
-                make_csv()
-        except Exception as e:
-            print(e)
-            self.send_discord_message()
+        # Check if it's the last day of month and make tweet
+        self.last_day_of_month = get_now_arg().day == monthrange(get_now_arg().year, get_now_arg().month)[1]
+        self.make_tweet()
+
+        # Make csv for next month
+        if self.last_day_of_month:
+            make_csv()
 
     def make_tweet(self):
         # Set Tweet's content
