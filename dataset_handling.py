@@ -2,6 +2,9 @@ from datetime import timedelta
 from typing import List, Dict
 import pandas as pd
 import requests
+import os
+
+from dotenv import load_dotenv
 
 from util import get_now_arg
 
@@ -63,6 +66,9 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
     :param items: a list containing the id's of the items
     :return: a dictionary containing the id's of the items as keys and their prices as values
     """
+    load_dotenv()
+    access_token = os.environ.get("MELI_ACCESS_TOKEN")
+
     # Split the items dict into chunks of 20
     items = [items[i:i + 20] for i in range(0, len(items), 20)]
 
@@ -70,8 +76,8 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
     for items_chunk in items:
         # Create a string with the id's of the items separated by commas
         items_str = ','.join(items_chunk)
-        json = requests.get(f'https://api.mercadolibre.com/items?ids={items_str}'
-                            f'&attributes=id,price,shipping.logistic_type').json()
+        url = f'https://api.mercadolibre.com/items?ids={items_str}&attributes=id,price,shipping.logistic_type'
+        json = requests.get(url, headers={'Authorization': f'Bearer {access_token}'}).json()
         for item in json:
             try:
                 if item["code"] == 200 and "price" in item["body"]:

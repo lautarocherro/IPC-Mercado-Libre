@@ -5,6 +5,8 @@ import util
 from dataset_handling import make_csv, get_updated_month_df
 
 import requests
+from dotenv import load_dotenv
+
 
 from util import get_today_str, get_now_arg
 from requests_oauthlib import OAuth1Session
@@ -17,6 +19,8 @@ class IPCMeli:
         self.today_inflation = None
         self.month_inflation = None
         self.tweet_content = None
+
+        load_dotenv()
         self.consumer_key = os.environ.get("TW_CONSUMER_KEY")
         self.consumer_secret = os.environ.get("TW_CONSUMER_SECRET")
         self.oauth_token = os.environ.get("TW_OAUTH_TOKEN")
