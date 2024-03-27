@@ -105,6 +105,7 @@ class IPCMeli:
 
         if yesterday_str == today_str:
             print("Date's inflation already calculated")
+            raise Exception
 
         # Get comparable df (remove deleted posts)
         month_df = month_df[month_df[today_str] > 0]
