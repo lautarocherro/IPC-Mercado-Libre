@@ -103,6 +103,9 @@ class IPCMeli:
         # Get yesterday to compare with current date
         yesterday_str = (get_now_arg() - timedelta(days=1)).strftime("%Y-%m-%d")
 
+        if yesterday_str == today_str:
+            print("Date's inflation already calculated")
+
         # Get comparable df (remove deleted posts)
         month_df = month_df[month_df[today_str] > 0]
 
