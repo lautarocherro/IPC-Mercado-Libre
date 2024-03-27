@@ -2,7 +2,7 @@ from calendar import monthrange
 from datetime import timedelta
 import os
 import util
-from dataset_handling import make_csv, get_updated_month_df
+from dataset_handling import make_csv, get_updated_month_df, get_month_df
 
 import requests
 from dotenv import load_dotenv
@@ -94,8 +94,6 @@ class IPCMeli:
             self.tweet_content += f'🔺 La tasa anual acumulada es del {self.ytd_inflation}%\n'
 
     def calculate_inflation(self):
-        # Get updated month df
-        month_df = get_updated_month_df()
 
         # Get current date
         today_str = get_now_arg().strftime("%Y-%m-%d")
@@ -103,9 +101,14 @@ class IPCMeli:
         # Get yesterday to compare with current date
         yesterday_str = (get_now_arg() - timedelta(days=1)).strftime("%Y-%m-%d")
 
-        if yesterday_str == today_str:
-            print("Date's inflation already calculated")
-            raise Exception
+        # Get last analyzed date and compare to today
+        last_analyzed_date = get_month_df().columns.format(list)[-1]
+
+        if today_str == last_analyzed_date:
+            raise Exception("Date's inflation already calculated")
+
+        # Get updated month df
+        month_df = get_updated_month_df()
 
         # Get comparable df (remove deleted posts)
         month_df = month_df[month_df[today_str] > 0]

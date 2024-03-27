@@ -93,12 +93,19 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
     return prices
 
 
-def get_updated_month_df() -> pd.DataFrame:
+def get_month_df() -> pd.DataFrame:
     # Get the csv name
     csv_name = get_now_arg().strftime("%Y-%m")
 
     # Load csv to a dataframe
     month_df = pd.read_csv(f'datasets/{csv_name}.csv')
+
+    return month_df
+
+
+def get_updated_month_df() -> pd.DataFrame:
+    # Get current month's df
+    month_df = get_month_df()
 
     # Get ID's to check today's prices
     ids = month_df['id'].tolist()
