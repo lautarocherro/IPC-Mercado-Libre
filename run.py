@@ -106,6 +106,9 @@ class IPCMeli:
 
         if today_str == last_analyzed_date:
             raise Exception("Date's inflation already calculated")
+        elif yesterday_str > last_analyzed_date:
+            self.send_discord_message(f"Analizando más de una fecha, del {last_analyzed_date} al {yesterday_str}")
+            yesterday_str = last_analyzed_date
 
         # Get updated month df
         month_df = get_updated_month_df()
@@ -128,10 +131,8 @@ class IPCMeli:
         if util.get_now_arg().year >= 2024:
             self.ytd_inflation = util.get_ytd_inflation(self.month_inflation)
 
-    def send_discord_message(self):
+    def send_discord_message(self, message_content: str):
         try:
-            message_content = 'Falló la generación de un tweet :('
-
             data = {
                 'content': message_content
             }
