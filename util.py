@@ -1,6 +1,10 @@
+import ast
+import base64
 import json
+import os
 from datetime import datetime, timedelta
 
+import requests
 
 weekday_mapping = {
     "Sunday": f"Domingo",
@@ -74,3 +78,76 @@ def get_now_arg():
     utc_minus_3_time = utc_now + utc_minus_3_delta
 
     return utc_minus_3_time
+
+
+def get_access_token():
+    client_id = os.environ.get("MELI_CLIENT_ID")
+    client_secret = os.environ.get("MELI_CLIENT_SECRET")
+
+    # Define the endpoint URL
+    url = 'https://api.mercadolibre.com/oauth/token'
+
+    # Define headers
+    headers = {
+        'accept': 'application/json',
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+
+    # Define the payload data
+    with open("meli_refresh_token") as f:
+        encoded_refresh_token = f.read()
+    refresh_token = decode_token(encoded_refresh_token)
+
+    payload = {
+        'grant_type': 'refresh_token',
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'refresh_token': refresh_token
+    }
+
+    response = requests.post(url, data=payload, headers=headers).text
+
+    response_dict = ast.literal_eval(response)
+
+    with open("meli_refresh_token", "w") as f:
+        f.write(encode_token(response_dict["refresh_token"]))
+
+    return response_dict["access_token"]
+
+
+def decode_token(encoded_message):
+    secret_key = os.environ.get("SECRET_KEY")
+
+    # Decode the base64-encoded message
+    encoded_bytes = base64.b64decode(encoded_message)
+
+    # Convert the secret key to bytes
+    secret_key_bytes = secret_key.encode('utf-8')
+
+    # XOR each byte of the encoded message with the corresponding byte of the secret key
+    decoded_bytes = bytearray()
+    for i in range(len(encoded_bytes)):
+        decoded_byte = encoded_bytes[i] ^ secret_key_bytes[i % len(secret_key_bytes)]
+        decoded_bytes.append(decoded_byte)
+
+    # Decode the result as a UTF-8 string
+    decoded_message = decoded_bytes.decode('utf-8')
+    return decoded_message
+
+
+def encode_token(message):
+    secret_key = os.environ.get("SECRET_KEY")
+
+    # Convert the message and secret key to bytes
+    message_bytes = message.encode('utf-8')
+    secret_key_bytes = secret_key.encode('utf-8')
+
+    # XOR each byte of the message with the corresponding byte of the secret key
+    encoded_bytes = bytearray()
+    for i in range(len(message_bytes)):
+        encoded_byte = message_bytes[i] ^ secret_key_bytes[i % len(secret_key_bytes)]
+        encoded_bytes.append(encoded_byte)
+
+    # Encode the result using base64
+    encoded_message = base64.b64encode(encoded_bytes).decode('utf-8')
+    return encoded_message

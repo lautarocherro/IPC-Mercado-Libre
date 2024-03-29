@@ -2,9 +2,7 @@ from datetime import timedelta
 from typing import List, Dict
 import pandas as pd
 import requests
-import os
-
-from util import get_now_arg
+from util import get_access_token, get_now_arg
 
 
 def make_csv() -> None:
@@ -64,7 +62,7 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
     :param items: a list containing the id's of the items
     :return: a dictionary containing the id's of the items as keys and their prices as values
     """
-    access_token = os.environ.get("MELI_ACCESS_TOKEN")
+    access_token = get_access_token()
 
     # Split the items dict into chunks of 20
     items = [items[i:i + 20] for i in range(0, len(items), 20)]
@@ -131,10 +129,3 @@ def get_updated_month_df() -> pd.DataFrame:
     month_df.to_csv(f'datasets/{csv_name}.csv', index=False)
 
     return month_df
-
-
-if __name__ == "__main__":
-    print('Starting')
-    make_csv()
-    print('Finishing')
-    get_updated_month_df()
