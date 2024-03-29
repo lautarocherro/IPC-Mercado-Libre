@@ -4,6 +4,7 @@ import pandas as pd
 import requests
 import os
 
+from dotenv import load_dotenv
 
 from util import get_now_arg
 
@@ -65,6 +66,7 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
     :param items: a list containing the id's of the items
     :return: a dictionary containing the id's of the items as keys and their prices as values
     """
+    load_dotenv()
     access_token = os.environ.get("MELI_ACCESS_TOKEN")
 
     # Split the items dict into chunks of 20
