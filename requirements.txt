@@ -1,4 +1,4 @@
 requests
 pandas
 requests_oauthlib
-dotenv
+python-dotenv
