@@ -4,7 +4,6 @@ import pandas as pd
 import requests
 import os
 
-from dotenv import load_dotenv
 
 from util import get_now_arg
 
