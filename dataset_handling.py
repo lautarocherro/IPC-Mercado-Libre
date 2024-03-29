@@ -102,6 +102,9 @@ def get_month_df() -> pd.DataFrame:
 
 
 def get_updated_month_df() -> pd.DataFrame:
+    # Get the csv name
+    csv_name = get_now_arg().strftime("%Y-%m")
+    
     # Get current month's df
     month_df = get_month_df()
 
