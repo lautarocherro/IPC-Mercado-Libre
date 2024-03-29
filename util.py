@@ -5,6 +5,9 @@ import os
 from datetime import datetime, timedelta
 
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 weekday_mapping = {
     "Sunday": f"Domingo",
@@ -30,7 +33,6 @@ month_mapping = {
     11: "Noviembre",
     12: "Diciembre"
 }
-
 
 def get_today_str() -> str:
     current_date = get_now_arg()
