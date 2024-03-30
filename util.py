@@ -5,9 +5,7 @@ import os
 from datetime import datetime, timedelta
 
 import requests
-from dotenv import load_dotenv
 
-load_dotenv()
 
 weekday_mapping = {
     "Sunday": f"Domingo",
@@ -86,6 +84,7 @@ def get_now_arg():
 def get_access_token():
     client_id = os.environ.get("MELI_CLIENT_ID")
     client_secret = os.environ.get("MELI_CLIENT_SECRET")
+    secret_key = os.environ.get("SECRET_KEY")
 
     # Define the endpoint URL
     url = 'https://api.mercadolibre.com/oauth/token'
@@ -99,7 +98,7 @@ def get_access_token():
     # Define the payload data
     with open("meli_refresh_token") as f:
         encoded_refresh_token = f.read()
-    refresh_token = decode_token(encoded_refresh_token)
+    refresh_token = decode_token(encoded_refresh_token, secret_key)
 
     payload = {
         'grant_type': 'refresh_token',
@@ -113,14 +112,12 @@ def get_access_token():
     response_dict = ast.literal_eval(response)
 
     with open("meli_refresh_token", "w") as f:
-        f.write(encode_token(response_dict["refresh_token"]))
+        f.write(encode_token(response_dict["refresh_token"], secret_key))
 
     return response_dict["access_token"]
 
 
-def decode_token(encoded_message):
-    secret_key = os.environ.get("SECRET_KEY")
-
+def decode_token(encoded_message, secret_key):
     # Decode the base64-encoded message
     encoded_bytes = base64.b64decode(encoded_message)
 
@@ -138,9 +135,7 @@ def decode_token(encoded_message):
     return decoded_message
 
 
-def encode_token(message):
-    secret_key = os.environ.get("SECRET_KEY")
-
+def encode_token(message, secret_key):
     # Convert the message and secret key to bytes
     message_bytes = message.encode('utf-8')
     secret_key_bytes = secret_key.encode('utf-8')
