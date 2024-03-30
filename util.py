@@ -34,6 +34,7 @@ month_mapping = {
     12: "Diciembre"
 }
 
+
 def get_today_str() -> str:
     current_date = get_now_arg()
     weekday = current_date.strftime("%A")
