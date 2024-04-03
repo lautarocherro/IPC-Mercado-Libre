@@ -3,13 +3,14 @@ from datetime import timedelta
 import os
 import util
 from dataset_handling import make_csv, get_updated_month_df, get_month_df
+from dotenv import load_dotenv
 
 import requests
-
 
 from util import get_today_str, get_now_arg
 from requests_oauthlib import OAuth1Session
 
+load_dotenv()
 
 class IPCMeli:
     def __init__(self):
