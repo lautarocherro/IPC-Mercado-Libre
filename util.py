@@ -84,7 +84,7 @@ def get_now_arg():
 def get_access_token():
     client_id = os.environ.get("MELI_CLIENT_ID")
     client_secret = os.environ.get("MELI_CLIENT_SECRET")
-    secret_key = os.environ.get("SECRET_KEY")
+    secret_key = os.environ.get("SUPER_SECRET_KEY")
 
     # Define the endpoint URL
     url = 'https://api.mercadolibre.com/oauth/token'
