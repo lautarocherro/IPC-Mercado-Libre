@@ -28,6 +28,9 @@ jobs:
         TW_OAUTH_TOKEN: ${{ secrets.TW_OAUTH_TOKEN }}
         TW_OAUTH_TOKEN_SECRET: ${{ secrets.TW_OAUTH_TOKEN_SECRET }}
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        MELI_CLIENT_ID: ${{ secrets.MELI_CLIENT_ID }}
+        MELI_CLIENT_SECRET: ${{ secrets.MELI_CLIENT_SECRET }}
+        SUPER_SECRET_KEY: ${{ secrets.SUPER_SECRET_KEY }}
 
     - name: Commit and push changes
       if: always() # Ensure this step always runs, regardless of previous steps' outcome

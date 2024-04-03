@@ -25,14 +25,7 @@ class IPCMeli:
         self.consumer_secret = os.environ.get("TW_CONSUMER_SECRET")
         self.oauth_token = os.environ.get("TW_OAUTH_TOKEN")
         self.oauth_token_secret = os.environ.get("TW_OAUTH_TOKEN_SECRET")
-        print(1)
-        print(self.oauth_token_secret)
         self.webhook_url = os.environ.get("DISCORD_WEBHOOK")
-        print(2)
-        print(self.webhook_url)
-        self.super_secret_key = os.environ.get("SUPER_SECRET_KEY")
-        print(3)
-        print(self.super_secret_key)
 
     def run(self):
         print(f'Running at {get_now_arg().strftime("%Y-%m-%d %H:%M:%S")}')
