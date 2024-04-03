@@ -12,6 +12,7 @@ from requests_oauthlib import OAuth1Session
 
 load_dotenv()
 
+
 class IPCMeli:
     def __init__(self):
         self.ytd_inflation = None
@@ -25,6 +26,7 @@ class IPCMeli:
         self.oauth_token = os.environ.get("TW_OAUTH_TOKEN")
         self.oauth_token_secret = os.environ.get("TW_OAUTH_TOKEN_SECRET")
         self.webhook_url = os.environ.get("DISCORD_WEBHOOK")
+        secret_key = os.environ.get("SUPER_SECRET_KEY")
 
     def run(self):
         print(f'Running at {get_now_arg().strftime("%Y-%m-%d %H:%M:%S")}')
