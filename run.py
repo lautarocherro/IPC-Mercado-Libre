@@ -124,7 +124,7 @@ class IPCMeli:
         self.today_inflation = round((today_price - yesterday_price) / yesterday_price * 100, 2)
 
         # Get price of first month's day (also has the date of last month's last date in the df)
-        last_day_of_last_month = util.get_last_day_of_last_month()
+        last_day_of_last_month = util.get_last_day_of_last_month().strftime("%Y-%m-%d")
         first_month_day_price = month_df[last_day_of_last_month].sum()
 
         self.month_inflation = round((today_price - first_month_day_price) / first_month_day_price * 100, 2)
