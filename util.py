@@ -4,6 +4,7 @@ import json
 import os
 from datetime import datetime, timedelta
 
+import pandas as pd
 import requests
 
 
@@ -66,6 +67,14 @@ def get_ytd_inflation(month_inflation: float) -> float:
     ytd_inflation *= 100
 
     return round(ytd_inflation, 2)
+
+
+def get_last_day_of_last_month():
+    now = get_now_arg()
+    first_day_of_month = now.replace(day=1)
+    last_day_of_last_month = first_day_of_month + timedelta(days=-1)
+
+    return last_day_of_last_month
 
 
 def get_now_arg():
@@ -149,3 +158,51 @@ def encode_token(message, secret_key):
     # Encode the result using base64
     encoded_message = base64.b64encode(encoded_bytes).decode('utf-8')
     return encoded_message
+
+
+def merge_parent_ids(items_df: pd.DataFrame):
+    categories_df = get_categories(only_ids=False)
+
+    month_categories = items_df["category_id"].unique()
+
+    # Create a DataFrame from month_categories
+    month_categories_df = pd.DataFrame({'category_id': month_categories})
+
+    # Merge categories_df with month_categories_df
+    merged_df = pd.merge(categories_df, month_categories_df, how='right', on='category_id')
+
+    # Filter out the rows where the index column is null
+    categories_df = merged_df[merged_df['category_id'].notnull()]
+
+    for index, row in categories_df.iterrows():
+        if pd.isna(row["category_name"]) or pd.isna(row["parent_id"]) or pd.isna(row["parent_name"]):
+            json_data = requests.get(f'https://api.mercadolibre.com/categories/{row["category_id"]}').json()
+
+            # Update the DataFrame with new values
+            categories_df.at[index, "category_name"] = json_data["name"]
+            categories_df.at[index, "parent_id"] = json_data['path_from_root'][0]['id']
+            categories_df.at[index, "parent_name"] = json_data['path_from_root'][0]['name']
+
+    # Save df
+    categories_df.to_csv('datasets/categories.csv', index=False)
+
+    # Drop unnecesary columns and merge df's
+    categories_df.drop(columns=["category_name", "parent_id"], inplace=True)
+
+    merged_df = pd.merge(categories_df, items_df, how='right', on='category_id')
+
+    return merged_df
+
+
+def get_categories(only_ids=True):
+    """
+    Get all the 2nd level categories from the MercadoLibre API
+    :return: a list containing the id's of all the 2nd level categories
+    """
+    categories_df = pd.read_csv('datasets/categories.csv')
+
+    if only_ids:
+        categories = list(categories_df["category_id"])
+        return categories
+
+    return categories_df

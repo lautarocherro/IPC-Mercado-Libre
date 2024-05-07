@@ -2,8 +2,7 @@ from datetime import timedelta
 from typing import List, Dict
 import pandas as pd
 import requests
-from util import get_access_token, get_now_arg
-import json
+from util import get_access_token, get_now_arg, merge_parent_ids, get_categories
 
 
 def make_csv() -> None:
@@ -14,23 +13,12 @@ def make_csv() -> None:
     # Get the data needed
     items_df = get_items_df(get_items_ids(get_categories()))
 
+    # Get categories df and merge
+    items_df = merge_parent_ids(items_df)
+
     # Create the csv file
     csv_name = (get_now_arg() + timedelta(days=1)).strftime("%Y-%m")
     items_df.to_csv(f'datasets/{csv_name}.csv', index=False)
-
-
-def get_categories(only_ids=True):
-    """
-    Get all the 2nd level categories from the MercadoLibre API
-    :return: a list containing the id's of all the 2nd level categories
-    """
-    with open("datasets/categories.txt") as file:
-        categories = json.load(file)
-
-    if only_ids:
-        categories = list(categories.keys())
-
-    return categories
 
 
 def get_items_ids(categories: List[str]) -> List[str]:
@@ -141,7 +129,11 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
                 if item["code"] == 200 and "price" in item["body"]:
                     item_id = item["body"]["id"]
                     price = item["body"]["price"]
-                    prices[item_id] = price
+
+                    if price >= 9999999:
+                        prices[item_id] = -1
+                    else:
+                        prices[item_id] = price
                 else:
                     item_id = item["body"]["id"]
                     prices[item_id] = -1

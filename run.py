@@ -123,8 +123,9 @@ class IPCMeli:
         # Get today's percentage change
         self.today_inflation = round((today_price - yesterday_price) / yesterday_price * 100, 2)
 
-        # Get column with index 5
-        first_month_day_price = month_df.iloc[:, 5:6].sum().iloc[0]
+        # Get price of first month's day (also has the date of last month's last date in the df)
+        last_day_of_last_month = util.get_last_day_of_last_month()
+        first_month_day_price = month_df[last_day_of_last_month].sum()
 
         self.month_inflation = round((today_price - first_month_day_price) / first_month_day_price * 100, 2)
 
