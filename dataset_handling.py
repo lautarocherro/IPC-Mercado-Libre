@@ -3,6 +3,7 @@ from typing import List, Dict
 import pandas as pd
 import requests
 from util import get_access_token, get_now_arg
+import json
 
 
 def make_csv() -> None:
@@ -11,31 +12,23 @@ def make_csv() -> None:
     :return: None
     """
     # Get the data needed
-    prices = get_items_prices(get_items_ids(get_categories()))
-
-    # Get the current date
-    today = get_now_arg().strftime("%Y-%m-%d")
-
-    # Create a Dataframe from the data
-    month_df = pd.DataFrame(
-        {
-            'id': prices.keys(),
-            today: prices.values(),
-         }
-    )
+    items_df = get_items_df(get_items_ids(get_categories()))
 
     # Create the csv file
     csv_name = (get_now_arg() + timedelta(days=1)).strftime("%Y-%m")
-    month_df.to_csv(f'datasets/{csv_name}.csv', index=False)
+    items_df.to_csv(f'datasets/{csv_name}.csv', index=False)
 
 
-def get_categories() -> List[str]:
+def get_categories(only_ids=True):
     """
     Get all the 2nd level categories from the MercadoLibre API
     :return: a list containing the id's of all the 2nd level categories
     """
     with open("datasets/categories.txt") as file:
-        categories = file.read().splitlines()
+        categories = json.load(file)
+
+    if only_ids:
+        categories = list(categories.keys())
 
     return categories
 
@@ -56,6 +49,76 @@ def get_items_ids(categories: List[str]) -> List[str]:
     return ids
 
 
+def get_items_df(items: List[str]) -> pd.DataFrame():
+    """
+    Get the prices of all the items passed as a parameter
+    :param items: a list containing the id's of the items
+    :return: a dictionary containing the id's of the items as keys and their prices as values
+    """
+    access_token = get_access_token()
+    today = get_now_arg().strftime("%Y-%m-%d")
+
+    # Split the items list into chunks of 20
+    items_chunks = [items[i:i + 20] for i in range(0, len(items), 20)]
+
+    # Initialize an empty list to store DataFrames
+    dfs = []
+
+    for items_chunk in items_chunks:
+        # Create a string with the ids of the items separated by commas
+        items_str = ','.join(items_chunk)
+        url = f'https://api.mercadolibre.com/items?ids={items_str}' \
+              '&attributes=id,price,title,permalink,thumbnail,category_id'
+        json_response = requests.get(url, headers={'Authorization': f'Bearer {access_token}'}).json()
+
+        rows = []  # Initialize an empty list to store rows for the current chunk
+
+        for item in json_response:
+            try:
+                if item["code"] == 200 and "price" in item["body"]:
+                    item_body = item["body"]
+
+                    item_id = item_body["id"]
+                    price = item_body["price"]
+                    title = item_body["title"]
+                    permalink = item_body["permalink"]
+                    thumbnail = item_body["thumbnail"]
+                    category_id = item_body["category_id"]
+
+                    # Append the row to the list of rows
+                    rows.append({
+                        "item_id": item_id,
+                        "title": title,
+                        "permalink": permalink,
+                        "thumbnail": thumbnail,
+                        "category_id": category_id,
+                        today: price,  # Dynamically set column name based on date
+                    })
+            except KeyError:
+                continue
+
+                # Convert the list of rows to a DataFrame for the current chunk
+        df_chunk = pd.DataFrame(rows)
+
+        # Append the DataFrame for the current chunk to the list of DataFrames
+        dfs.append(df_chunk)
+
+    # Concatenate all DataFrames in the list along rows
+    items_df = pd.concat(dfs, ignore_index=True)
+
+    return items_df
+
+
+def get_month_df() -> pd.DataFrame:
+    # Get the csv name
+    csv_name = get_now_arg().strftime("%Y-%m")
+
+    # Load csv to a dataframe
+    month_df = pd.read_csv(f'datasets/{csv_name}.csv')
+
+    return month_df
+
+
 def get_items_prices(items: List[str]) -> Dict[str, float]:
     """
     Get the prices of all the items passed as a parameter
@@ -71,7 +134,7 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
     for items_chunk in items:
         # Create a string with the id's of the items separated by commas
         items_str = ','.join(items_chunk)
-        url = f'https://api.mercadolibre.com/items?ids={items_str}&attributes=id,price,shipping.logistic_type'
+        url = f'https://api.mercadolibre.com/items?ids={items_str}&attributes=id,price'
         json = requests.get(url, headers={'Authorization': f'Bearer {access_token}'}).json()
         for item in json:
             try:
@@ -88,20 +151,10 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
     return prices
 
 
-def get_month_df() -> pd.DataFrame:
-    # Get the csv name
-    csv_name = get_now_arg().strftime("%Y-%m")
-
-    # Load csv to a dataframe
-    month_df = pd.read_csv(f'datasets/{csv_name}.csv')
-
-    return month_df
-
-
 def get_updated_month_df() -> pd.DataFrame:
     # Get the csv name
     csv_name = get_now_arg().strftime("%Y-%m")
-    
+
     # Get current month's df
     month_df = get_month_df()
 
@@ -129,3 +182,10 @@ def get_updated_month_df() -> pd.DataFrame:
     month_df.to_csv(f'datasets/{csv_name}.csv', index=False)
 
     return month_df
+
+
+if __name__ == "__main__":
+    from dotenv import load_dotenv
+
+    load_dotenv()
+    make_csv()
