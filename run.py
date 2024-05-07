@@ -1,13 +1,15 @@
 from calendar import monthrange
 from datetime import timedelta
 import os
-import util
+
+import numpy as np
+
 from dataset_handling import make_csv, get_updated_month_df, get_month_df
 from dotenv import load_dotenv
 
 import requests
 
-from util import get_today_str, get_now_arg
+from util import get_today_str, get_now_arg, get_ytd_inflation, get_last_day_of_last_month
 from requests_oauthlib import OAuth1Session
 
 load_dotenv()
@@ -117,20 +119,28 @@ class IPCMeli:
         month_df = month_df[month_df[today_str] > 0]
 
         # Compare prices
-        yesterday_price = month_df[yesterday_str].sum()
-        today_price = month_df[today_str].sum()
+        month_df['diff'] = round(((month_df[today_str] - month_df[yesterday_str]) / month_df[yesterday_str]) * 100, 2)
+
+        # Drop outliers
+        month_df.loc[month_df['diff'].abs() > 500, 'diff'] = np.nan
 
         # Get today's percentage change
-        self.today_inflation = round((today_price - yesterday_price) / yesterday_price * 100, 2)
+        self.today_inflation = round(month_df['diff'].mean(), 2)
 
         # Get price of first month's day (also has the date of last month's last date in the df)
-        last_day_of_last_month = util.get_last_day_of_last_month().strftime("%Y-%m-%d")
-        first_month_day_price = month_df[last_day_of_last_month].sum()
+        last_day_of_last_month = get_last_day_of_last_month().strftime("%Y-%m-%d")
 
-        self.month_inflation = round((today_price - first_month_day_price) / first_month_day_price * 100, 2)
+        # Compare prices to month beggining
+        month_df['diff_month'] = round(((month_df[today_str] - month_df[last_day_of_last_month]) /
+                                        month_df[last_day_of_last_month]) * 100, 2)
 
-        if util.get_now_arg().year >= 2024:
-            self.ytd_inflation = util.get_ytd_inflation(self.month_inflation)
+        # Drop outliers
+        month_df.loc[month_df['diff_month'].abs() > 500, 'diff_month'] = np.nan
+
+        # Get month's percentage change
+        self.month_inflation = round(month_df['diff_month'].mean(), 2)
+
+        self.ytd_inflation = get_ytd_inflation(self.month_inflation)
 
     def send_discord_message(self, message_content: str):
         try:
