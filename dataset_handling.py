@@ -1,5 +1,7 @@
 from datetime import timedelta
 from typing import List, Dict
+
+import numpy as np
 import pandas as pd
 import requests
 from util import get_access_token, get_now_arg, merge_parent_ids, get_categories
@@ -129,14 +131,10 @@ def get_items_prices(items: List[str]) -> Dict[str, float]:
                 if item["code"] == 200 and "price" in item["body"]:
                     item_id = item["body"]["id"]
                     price = item["body"]["price"]
-
-                    if price >= 9999999:
-                        prices[item_id] = -1
-                    else:
-                        prices[item_id] = price
+                    prices[item_id] = price
                 else:
                     item_id = item["body"]["id"]
-                    prices[item_id] = -1
+                    prices[item_id] = np.nan
             except:
                 continue
 
