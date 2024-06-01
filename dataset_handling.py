@@ -149,7 +149,7 @@ def get_updated_month_df() -> pd.DataFrame:
     month_df = get_month_df()
 
     # Get ID's to check today's prices
-    ids = month_df['id'].tolist()
+    ids = month_df['item_id'].tolist()
 
     # Get today's prices
     prices = get_items_prices(ids)
@@ -160,13 +160,13 @@ def get_updated_month_df() -> pd.DataFrame:
     # Make new df out of the prices
     new_prices_df = pd.DataFrame(
         {
-            'id': prices.keys(),
+            'item_id': prices.keys(),
             today: prices.values(),
         }
     )
 
     # Merge both dataframes by the id column
-    month_df = pd.merge(month_df, new_prices_df, on='id')
+    month_df = pd.merge(month_df, new_prices_df, on='item_id')
 
     # Save the dataframe to the csv file
     month_df.to_csv(f'datasets/{csv_name}.csv', index=False)
