@@ -104,7 +104,7 @@ class IPCMeli:
         yesterday_str = (get_now_arg() - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Get last analyzed date and compare to today
-        last_analyzed_date = get_month_df().columns.format(list)[-1]
+        last_analyzed_date = get_month_df().columns.astype(str).tolist()[-1]
 
         if today_str == last_analyzed_date:
             raise Exception("Date's inflation already calculated")
