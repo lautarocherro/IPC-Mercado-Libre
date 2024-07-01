@@ -21,23 +21,8 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-    - name: Run Python script with retries
-      run: |
-        max_retries=3
-        attempt=0
-        until [ $attempt -ge $max_retries ]
-        do
-          attempt=$((attempt+1))
-          echo "Attempt $attempt"
-          python run.py && break
-          if [ $attempt -lt $max_retries ]; then
-            echo "Script failed. Retrying in 10 seconds..."
-            sleep 10
-          else
-            echo "Script failed after $attempt attempts."
-            exit 1
-          fi
-        done
+    - name: Run Python script
+      run: python run.py
       env:
         TW_CONSUMER_KEY: ${{ secrets.TW_CONSUMER_KEY }}
         TW_CONSUMER_SECRET: ${{ secrets.TW_CONSUMER_SECRET }}
