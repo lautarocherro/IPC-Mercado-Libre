@@ -58,7 +58,7 @@ def get_items_df(items: List[str]) -> pd.DataFrame():
         # Create a string with the ids of the items separated by commas
         items_str = ','.join(items_chunk)
         url = f'https://api.mercadolibre.com/items?ids={items_str}' \
-              '&attributes=id,price,title,permalink,thumbnail,category_id'
+            '&attributes=id,price,title,permalink,thumbnail,category_id'
         json_response = requests.get(url, headers={'Authorization': f'Bearer {access_token}'}).json()
 
         rows = []  # Initialize an empty list to store rows for the current chunk
