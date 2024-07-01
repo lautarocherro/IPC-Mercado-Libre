@@ -38,6 +38,7 @@ class IPCMeli:
 
         # Make csv for next month
         if self.last_day_of_month:
+            print("Making csv for next month")
             make_csv()
 
     def make_tweet(self):
